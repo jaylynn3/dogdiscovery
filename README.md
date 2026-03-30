@@ -41,8 +41,9 @@ The following **additional** features are implemented:
 * [ ] List anything else that you added to improve the site's functionality!
 
 ## Video Walkthrough
-
 Here's a walkthrough of implemented user stories:
+
+<img width="878" height="398" alt="image" src="https://github.com/user-attachments/assets/42cbb122-086e-477e-ac28-d555d958b029" />
 
 <img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
@@ -59,7 +60,7 @@ Describe any challenges encountered while building the app.
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright [2026] [Jaylynn Hemmings]
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
