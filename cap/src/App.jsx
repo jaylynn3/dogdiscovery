@@ -4,12 +4,19 @@ import "./App.css";
 const ACCESS_KEY = import.meta.env.VITE_APP_ACCESS_KEY;
 
 function App() {
-  const [dog, setDog] = useState(null);
+  const [cat, setCat] = useState(null);
+  const [banList, setBanList] = useState([]);
 
-  const fetchDog = async () => {
-    try {
+  const fetchCat = async () => {
+    let valid = false;
+    let data;
+    let attempts = 0;
+
+    while (!valid && attempts < 10) {
+      attempts++;
+
       const response = await fetch(
-        "https://api.thedogapi.com/v1/images/search",
+        "https://api.thecatapi.com/v1/images/search?has_breeds=1",
         {
           headers: {
             "x-api-key": ACCESS_KEY,
@@ -17,32 +24,103 @@ function App() {
         }
       );
 
-      const data = await response.json();
-      setDog(data[0]); // show the first dog from the API
-    } catch (error) {
-      console.error("Error fetching dog:", error);
-      alert("Failed to fetch dog. Try again.");
+      data = await response.json();
+
+      if (!data[0].breeds || data[0].breeds.length === 0) {
+        continue;
+      }
+
+      const breed = data[0].breeds[0].name;
+      const origin = data[0].breeds[0].origin;
+      const traits = data[0].breeds[0].temperament
+        ? data[0].breeds[0].temperament.split(", ")
+        : [];
+
+      const hasBanned =
+        banList.includes(breed) ||
+        banList.includes(origin) ||
+        traits.some((t) => banList.includes(t));
+
+      if (hasBanned) {
+        continue;
+      }
+
+      valid = true;
     }
+
+    if (!valid) {
+      alert("Valid cat not found");
+      return;
+    }
+
+    setCat(data[0]);
+  };
+
+  const addBan = (item) => {
+    if (!banList.includes(item)) {
+      setBanList([...banList, item]);
+    }
+  };
+
+  const removeBan = (item) => {
+    setBanList(banList.filter((b) => b !== item));
   };
 
   return (
     <div>
-      <h1>Dog Discovery Machine</h1>
-      <button onClick={fetchDog}>Discover</button>
+      <h1>Cat Contrivance Component ≽^•⩊•^≼</h1>
 
-      {dog && (
-        <div style={{ marginTop: "20px" }}>
-          <img src={dog.url} width="300" alt="Random Dog" />
+      <button className="button" onClick={fetchCat}>Discover ฅ ฅ</button>
 
-          {dog.breeds && dog.breeds.length > 0 && (
+      {cat && (
+        <div>
+          <img src={cat.url} width="300" alt="Cat" />
+
+          {cat.breeds && cat.breeds.length > 0 && (
             <div>
-              <p><strong>Breed:</strong> {dog.breeds[0].name}</p>
-              {dog.breeds[0].origin && <p><strong>Origin:</strong> {dog.breeds[0].origin}</p>}
-              {dog.breeds[0].temperament && <p><strong>Temperament:</strong> {dog.breeds[0].temperament}</p>}
-            </div>
+  <p>
+    Breed:
+    <button onClick={() => addBan(cat.breeds[0].name)}>
+      {cat.breeds[0].name}
+    </button>
+  </p>
+
+  <p>
+    Origin:
+    <button onClick={() => addBan(cat.breeds[0].origin)}>
+      {cat.breeds[0].origin}
+    </button>
+  </p>
+
+  <p>
+    Temperament:
+    {cat.breeds[0].temperament
+      ? cat.breeds[0].temperament.split(", ").map((trait) => (
+          <button
+            key={trait}
+            onClick={() => addBan(trait)}
+          >
+            {trait}
+          </button>
+        ))
+      : " No data"}
+  </p>
+</div>
           )}
         </div>
       )}
+
+      <div className="banlist">
+  <h2>Ban List</h2>
+
+  {banList.length === 0 && <p>No bans yet</p>}
+
+  {banList.map((item, index) => (
+    <button key={index} onClick={() => removeBan(item)}>
+      {item}
+    </button>
+  ))}
+</div>
     </div>
   );
 }
